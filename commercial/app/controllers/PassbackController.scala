@@ -4,6 +4,7 @@ import conf.Configuration.commercial._
 import model.Cached.WithoutRevalidationResult
 import model.{CacheTime, Cached}
 import play.api.mvc._
+import experiments.{ActiveExperiments, GptPath}
 
 class PassbackController(val controllerComponents: ControllerComponents) extends BaseController {
 
@@ -25,7 +26,8 @@ class PassbackController(val controllerComponents: ControllerComponents) extends
               adUnitName = s"$dfpAdUnitGuRoot/x-passback/ias",
               passbackTarget = "ias",
               width.toInt,
-              height.toInt
+              height.toInt,
+              ActiveExperiments.isParticipating(GptPath)
             ))
         case _ =>
           NotFound

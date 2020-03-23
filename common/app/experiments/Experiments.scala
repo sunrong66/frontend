@@ -29,3 +29,11 @@ object DotcomRendering extends Experiment(
   sellByDate = new LocalDate(2020, 12, 1),
   participationGroup = Perc5A // Also see ArticlePicker.scala - our main filter mechanism is by page features
 )
+
+object GptPath extends Experiment(
+  name = "gpt-path",
+  description = "Test updated gpt.js path",
+  owners = Seq(Owner.withGithub("GHaberis")),
+  sellByDate = new LocalDate(2020, 4, 20),
+  participationGroup = Perc0A
+)

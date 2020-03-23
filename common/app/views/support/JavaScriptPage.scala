@@ -8,12 +8,15 @@ import conf.Configuration.environment
 import conf.switches.Switches.prebidSwitch
 import conf.switches.Switches.a9Switch
 import conf.{Configuration, DiscussionAsset}
+import experiments.{ActiveExperiments, GptPath}
 import model._
 import play.api.libs.json._
+import play.api.mvc.RequestHeader
+
 
 object JavaScriptPage {
 
-  def get(page: Page, edition: Edition, isPreview: Boolean): JsValue = Json.toJson(getMap(page, edition, isPreview))
+  def get(page: Page, edition: Edition, isPreview: Boolean)(implicit request: RequestHeader): JsValue = Json.toJson(getMap(page, edition, isPreview))
 
   def getMap(page: Page, edition: Edition, isPreview: Boolean): Map[String,JsValue] = {
     val metaData = page.metadata
@@ -23,7 +26,13 @@ object JavaScriptPage {
       CamelCase.fromHyphenated(key.split('.').lastOption.getOrElse(""))
     }
 
-    val config = (Configuration.javascript.config ++ pageData).mapValues(JsString.apply)
+
+    val config = if (ActiveExperiments.isParticipating(GptPath)) {
+      (Configuration.javascript.configWithNewGpT ++ pageData).mapValues(JsString.apply)
+    } else {
+      (Configuration.javascript.config ++ pageData).mapValues(JsString.apply)
+    }
+
     val sponsorshipType = for {
       commercial <- page.metadata.commercial
       branding <- commercial.branding(edition)

@@ -17,6 +17,7 @@ import services.ParameterStore
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
+import experiments.{ActiveExperiments, GptPath}
 
 class BadConfigurationException(msg: String) extends RuntimeException(msg)
 
@@ -239,7 +240,8 @@ class GuardianConfiguration extends Logging {
   }
 
   object googletag {
-    lazy val jsLocation = configuration.getStringProperty("googletag.js.location").getOrElse("//securepubads.g.doubleclick.net/tag/js/gpt.js")
+      lazy val jsLocation = configuration.getStringProperty("googletag.js.location").getOrElse("//www.googletagservices.com/tag/js/gpt.js")
+      lazy val newJsLocation =  "//securepubads.g.doubleclick.net/tag/js/gpt.js"
   }
 
   // Amazon A9 APS Transparent Ad Marketplace library
@@ -510,6 +512,8 @@ class GuardianConfiguration extends Logging {
       ("optimizeEpicUrl", id.optimizeEpicUrl),
       ("a9PublisherId", a9ApsTag.key)
     )
+
+    lazy val configWithNewGpT:  Map[String, String] = config.updated("googletagJsUrl", googletag.newJsLocation)
 
     lazy val pageData: Map[String, String] = {
       val keys = configuration.getPropertyNames.filter(_.startsWith("guardian.page."))
